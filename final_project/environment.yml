@@ -1,0 +1,16 @@
+# The pinned environment of the project. setup_project.py creates it (conda env create -f environment.yml).
+# Add a package here (one line), then: conda env update -f final_project/environment.yml --prune. Commit this file.
+# Before you submit, the exact versions you used: conda env export --from-history
+name: compmacro-project
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - numpy=2.2.*
+  - scipy=1.15.*
+  - matplotlib=3.10.*
+  # tools, not needed to run the project, needed to work on it
+  - pytest
+  - black
+  - pre-commit
+  - jupyter  # notebooks for exploring only, the project runs without them

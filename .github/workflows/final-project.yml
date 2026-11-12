@@ -1,0 +1,72 @@
+# The check of the final project: after every push that touches the project, GitHub runs it on a clean machine.
+# A green tick on the commit means: the code is formatted, run_all.py reproduces every figure and table from
+# scratch in the pinned environment, the smoke test passes, and the write-up compiles. The reproduced output and
+# write-up can be downloaded from the run (Artifacts). You do not need to change this file.
+name: final project
+
+on:
+  push:
+    paths:
+      - "final_project/**"
+      - ".github/workflows/final-project.yml"
+      - ".pre-commit-config.yaml"
+      - "pyproject.toml"
+  workflow_dispatch:  # the button "Run workflow" in the Actions tab
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce:
+    name: formatted, reproduces, test passes, write-up compiles
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash -el {0}  # a login shell, so that the conda environment is active
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: The environment of environment.yml
+        uses: conda-incubator/setup-miniconda@v4
+        with:
+          miniforge-version: latest
+          environment-file: final_project/environment.yml
+          activate-environment: compmacro-project
+
+      - name: Formatting (the pre-commit hooks, on the files of the project)
+        run: |
+          git ls-files -z final_project | { grep -zv '^final_project/formatting_demo/' || true; } |
+            xargs -0 -r pre-commit run --show-diff-on-failure --color=always --files
+
+      - name: run_all.py from scratch
+        run: |
+          if [ -d final_project/output ]; then find final_project/output -type f ! -name .gitkeep -delete; fi
+          python final_project/run_all.py
+
+      - name: Are the committed tables those of the code?
+        run: |
+          if ! git diff --quiet -- final_project/output/tables; then
+            echo "::warning::output/tables in the repository differ from a fresh run of run_all.py. Run it, compile the write-up, commit both."
+            git diff --stat -- final_project/output/tables
+          fi
+
+      - name: Smoke test
+        run: python -m pytest -q
+
+      - name: Write-up
+        if: hashFiles('final_project/writeup/project.tex') != ''
+        uses: xu-cheng/latex-action@v4
+        with:
+          root_file: project.tex
+          working_directory: final_project/writeup
+
+      - name: Keep the reproduced output and write-up
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reproduced-output
+          path: |
+            final_project/output
+            final_project/writeup/project.pdf
+          if-no-files-found: ignore

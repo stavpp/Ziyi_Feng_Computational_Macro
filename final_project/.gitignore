@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# LaTeX build files of the write-up (the PDF itself is committed)
+writeup/*.aux
+writeup/*.log
+writeup/*.out
+writeup/*.toc
+writeup/*.synctex.gz
+writeup/*.fdb_latexmk
+writeup/*.fls
+
+# editor and OS files
+.DS_Store
+Thumbs.db

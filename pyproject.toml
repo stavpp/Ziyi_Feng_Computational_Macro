@@ -1,0 +1,12 @@
+# Settings of the tools, at the root of the repository. black reads [tool.black] whenever it runs here, from the
+# terminal, from VS Code, or from the pre-commit hook, so everybody formats alike, problem sets included.
+[tool.black]
+line-length = 110
+target-version = ["py312"]
+
+# pytest finds the smoke test from anywhere in the repository; final_project/ is on the import path, so the
+# test can import src.
+[tool.pytest.ini_options]
+testpaths = ["final_project/tests"]
+pythonpath = ["final_project"]
+cache_dir = "final_project/.pytest_cache"  # ignored by final_project/.gitignore

@@ -1,0 +1,3 @@
+Aiyagari: r* = 2.534 percent after 16 bisection steps, K* = 7.575
+simulation at r*: mean assets 7.553, s.e. over 5 seeds 0.026
+run_all.py finished in 3.3 s, numpy 2.5.3
